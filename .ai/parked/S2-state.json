@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "current_phase": "SPRINT-EXECUTION",
+  "current_sprint_id": "S2",
+  "sprint_status": "blocked",
+  "assigned_model": "sonnet",
+  "assigned_persona": "coder",
+  "last_commit": "03d8074",
+  "next_action": "Blocked on glunk-works/global-bootstrap#17 (aoss:collection condition doesn't cover index-level rules, so CreateAccessPolicy 403s on the data-access policy's index/bedrock-rag-store/* rule). Once that upstream PR merges: re-run S2 Task 4 step 3's full cycle from sub-step 3.2 -- push to main queues a tofu-apply, click the production Environment approval, and this time expect all 12 resources (not 8) -- then sub-step 3.3, dispatch destroy-ai-lab with the typed confirm phrase (BR-D25) to prove the clean cycle #17's own Acceptance section requires. Full spec: grep -n '^### Task 4' -A 60 sprints/S2_identity_least_privilege/sprint_plan.md.",
+  "hitl_gate": "OPEN -- blocked on an upstream fix landing in glunk-works/global-bootstrap#17, then the same two human-gated actions as before (production Environment approval on re-apply; destroy-ai-lab confirm phrase on re-destroy). Do not resume-auto-start against this cursor.",
+  "pointers": {
+    "roadmap": "docs/hardening_roadmap.md -- untouched; BR-D14 (architect-review readiness tied to S2 landing) is the relevant entry, and this blocker is part of why S2 hasn't landed yet.",
+    "sprint_plan": "sprints/S2_identity_least_privilege/sprint_plan.md -- Task 4 step 3: 3.1 satisfied, 3.2 partially run (8/12 resources, then failed), 3.3 run against the partial build (destroy succeeded), full clean cycle still pending the upstream fix.",
+    "session_summary": "2026-09-23. S2 Task 4 step 3's human-gated sub-steps were carried out: the queued tofu-apply (from PR #129's merge, commit 0094f29) was approved via the production Environment gate -- deploy run 35855923494 -- and built 8 of 12 resources before failing: AccessDeniedException on aoss:CreateAccessPolicy for the data-access policy's index/bedrock-rag-store/* rule. Root cause: global-bootstrap's WriteCollectionPoliciesForOurCollection statement conditions on aoss:collection, which AWS documents does not extend to index-level rules -- the index case was never actually tested before this apply despite the statement's comment claiming verification. Filed as glunk-works/global-bootstrap#17 with root cause and a proposed companion statement (condition on aoss:index) rather than fixed here, since the fix is upstream IaC this repo doesn't own. destroy-ai-lab was then dispatched against the partial build and succeeded (run 35860478219) -- nothing is live. No PR against global-bootstrap#17 exists yet.",
+    "known_followups": "SD is parked (.ai/parked/SD-state.json) with Task 4 still to do once unparked. v0.8.0 canary (claude-workbench#36): park-sprint and unpark-sprint both exercised for real (PR #131 merged; this park of S2 -> restore of SD completes the round-trip), architect-review's no-gate stop confirmed against PR #131 -- ready to report clean. CARRIED, unchanged: glunk-works/global-bootstrap has NO CI and NO branch protection ruleset -- worth an issue, still not filed. bootstrap/state-migration.tf's kms:EncryptionContext residual, closed by S2 Task 4 step 4. security-critic's LOW finding that no required check can see encryption.tf's enforced=true. bedrock-serverless-rag#101, #100, #95, #96, #74; global-bootstrap#10; the DynamoDB lock table's pipeline_state_policy missing dynamodb:LeadingKeys."
+  },
+  "parked_at": "2026-09-23",
+  "parked_reason": "Blocked on glunk-works/global-bootstrap#17 (upstream IAM fix needed before the S2 Task 4 step 3 cycle can complete cleanly); swapping back to SD to finish the v0.8.0 park/unpark canary rather than chase the upstream fix now.",
+  "parked_from_commit": "03d8074"
+}
