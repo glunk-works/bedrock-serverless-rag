@@ -10,10 +10,12 @@ Regenerate this at the end of every working session.
 `SD` Tasks 1–2 are merged; Tasks 3–4 are the active work. `S2` Task 4 continues as a parallel,
 human-gated thread.
 
-⚠️ **Merge [PR #122](https://github.com/glunk-works/bedrock-serverless-rag/pull/122) and then
-restart Claude Code before doing anything else.** Both the `v0.6.0` plugin and the new GitHub
-MCP tools need a fresh process — this session ran on cached `0.5.1` with the MCP server
-registered but not loaded.
+⚠️ **Restart Claude Code before doing anything else.** The `way-of-working` plugin pin has moved
+twice since the last restart: `v0.5.1` → `v0.6.0` ([PR #122](https://github.com/glunk-works/bedrock-serverless-rag/pull/122),
+merged) → `v0.8.0` ([PR #129](https://github.com/glunk-works/bedrock-serverless-rag/pull/129),
+merged 2026-09-23). Both that bump and the GitHub MCP tools registered at `local` scope (see
+below) only load in a fresh process — a session that started before either change stays on
+stale skills/tools no matter what the repo now says.
 
 ## Just done
 
@@ -35,10 +37,18 @@ registered but not loaded.
   would ship **broken** into the devcontainer (no `pwsh`, no docker-in-docker, `USERPROFILE`
   empty on Linux) and to every contributor on a public repo.
 - **`way-of-working` pinned to `v0.6.0`** ([PR #122](https://github.com/glunk-works/bedrock-serverless-rag/pull/122),
-  **open**, all 6 required checks green). Root-caused why the earlier bump never took effect:
+  **merged**, all 6 required checks green). Root-caused why the earlier bump never took effect:
   install records duplicate by **drive-letter case** (`c:\` on `0.5.1`, `C:\` on `0.6.0`), and
   `claude plugin update -s project` matched the upper-case record and reported a **false green**.
   Corrected by hand; reported at [claude-workbench#36](https://github.com/glunk-works/claude-workbench/pull/36#issuecomment-5293546340).
+- **`way-of-working` bumped again to `v0.8.0`** ([PR #129](https://github.com/glunk-works/bedrock-serverless-rag/pull/129),
+  **merged** 2026-09-23). v0.7.0 added sprint archival (`/way-of-working:archive-sprint`,
+  `bin/entry-anchor.sh` fixtures, a fixture-coverage Definition-of-Done requirement); v0.8.0
+  added the `architect-review` skill / `review-gate` predicate and parked-sprint support
+  (`/way-of-working:park-sprint`, `/way-of-working:unpark-sprint`, `.ai/parked/*` cursor-sync
+  classification). Neither release added, removed, or renamed an `.ai/project.yml` key —
+  `review.ci_gate` stays `null` on purpose (BR-D14), so skills still take the no-gate branch;
+  `architect-review` is available but not wired to a required check in this repo.
 - **Canary re-checked:** [anthropics/claude-code#16299](https://github.com/anthropics/claude-code/issues/16299)
   is still OPEN, no fix, last activity 2026-04-15 — `.claude/rules` path-scoping stays off the table.
 
@@ -59,9 +69,10 @@ registered but not loaded.
    server** (App auth, why not PAT/OAuth, the digest pin, devcontainer incompatibility).
 3. **S2 Task 4 step 3** — sub-steps 3.2/3.3, unchanged, **human-gated**.
 
-Also worth doing next session: the **`v0.6.0` canary run** upstream owes
-`claude-workbench#36` a full `/way-of-working:resume` → `/way-of-working:ship` pass against a
-*loaded* `v0.6.0`; stage 2 fan-out is waiting on it.
+Also worth doing next session: the **canary run** upstream owes `claude-workbench#36` a full
+`/way-of-working:resume` → `/way-of-working:ship` pass against a *loaded* plugin — now `v0.8.0`,
+not the `v0.6.0` originally promised, since the pin moved again before that pass ran; stage 2
+fan-out is waiting on it.
 
 ## Open gates and blockers
 
