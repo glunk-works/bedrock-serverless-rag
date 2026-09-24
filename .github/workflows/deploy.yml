@@ -111,7 +111,7 @@ jobs:
       # must never hold apply-capable credentials (BR-D7). A missing/empty
       # AWS_PLAN_ROLE_ARN now fails the masking step above rather than silently falling
       # through to a more powerful role.
-      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_PLAN_ROLE_ARN }}
           aws-region: us-east-1
@@ -248,7 +248,7 @@ jobs:
       # GitHub specifically, "restricted, use a variable" and "never in a workflow log"
       # are in direct conflict; this is the one place BR-D4's stated split does not hold,
       # and secrets.* is the only mechanism that delivers what BR-D4 actually wants here.
-      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: us-east-1
@@ -350,7 +350,7 @@ jobs:
           # .devcontainer/Dockerfile pins the same version; keep both in sync (BR-D15).
           tofu_version: "1.12.5"
 
-      - uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: us-east-1
