@@ -1,4 +1,10 @@
-### FILEPATH: /sprints/S4_rag_security/sprint_plan.md
+### FILEPATH: /sprints/_archive/S4_rag_security/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #3 (`S3+S4 — Data-plane and RAG
+> posture`).** The task bodies below are no longer the executable plan: the surviving tasks are
+> issues #145 (T1), #146 (T3), #147 (T4, guard + relocation only) and #148 (T5, variable
+> extraction only); T2 was cut for a blast-radius reason and has no issue. This file is kept for
+> the BR-D23 banner and its **Critical review**.
 
 # S4 — RAG security
 

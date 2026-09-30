@@ -8,8 +8,9 @@
 # option — a repo-local `.claude/skills/<name>/` shadows the plugin's copy entirely and
 # silently stops receiving upstream fixes.
 #
-# EVERY VALUE BELOW DESCRIBES THIS REPO AS IT IS ON 2026-08-09 (last touched by S1b-T7's
-# ruleset.required_checks update), not as the hardening roadmap intends it to become. A sprint
+# EVERY VALUE BELOW DESCRIBES THIS REPO AS IT IS ON 2026-09-30 (last touched by the
+# files-to-milestones migration: `planning.kind` became load-bearing and the sprint-plan glob
+# left `load_bearing_docs`), not as the hardening roadmap intends it to become. A sprint
 # that changes one of these facts updates this file in the SAME pull request; a stale value
 # here makes every skill that reads it report a confident answer about a repo that no longer
 # exists. This date has gone stale silently before (two days, on `ruleset.name`'s own null
@@ -81,11 +82,17 @@ backlog:
 # and a Titan v1 embedding model the code no longer uses. Auditing it
 # today would re-report those known-stale claims (#8) on every pass. S6 rewrites it; the
 # same PR adds it to this list.
+#
+# `sprints/**/sprint_plan.md` was in this list until 2026-09-30. Under `planning.kind:
+# github_milestones` the live plans are milestone descriptions and issue bodies, which git
+# cannot see and this audit set cannot cover (the plan anchor in `.ai/state.json` is what
+# covers them); the files left in `sprints/` and `sprints/_archive/` are historical record
+# whose banners describe past states on purpose, and auditing record for contradictions
+# re-reports history as drift. Deliberately absent, not forgotten.
 load_bearing_docs:
   - CLAUDE.md
   - docs/hardening_roadmap.md
   - .ai/next-steps.md
-  - sprints/**/sprint_plan.md
 
 # ── what counts as a behavior change ─────────────────────────────────────────
 # `bootstrap/` is in here on purpose even though it is applied by hand: it defines the OIDC
@@ -161,5 +168,11 @@ models:
   coder: sonnet
   second_opinion: "fable"
 
+# ── planning ────────────────────────────────────────────────────────────────
+# Load-bearing since 2026-09-30: one sprint = one GitHub milestone in `backlog.repo`, the
+# milestone's open issues are the task list, and the cursor's `pointers.sprint_plan` is the
+# milestone URL with a `plan_anchor` beside it. The file-based plans this replaced are record,
+# not plan: `sprints/` (completed sprints) and `sprints/_archive/` (the six migrated ones);
+# `sprints_dir` above stays declared and unused, as the schema allows for this kind.
 planning:
   kind: "github_milestones"

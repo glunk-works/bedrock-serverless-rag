@@ -1,4 +1,10 @@
-### FILEPATH: /sprints/S3_data_plane_posture/sprint_plan.md
+### FILEPATH: /sprints/_archive/S3_data_plane_posture/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #3 (`S3+S4 — Data-plane and RAG
+> posture`).** The task bodies below are no longer the executable plan: the surviving tasks are
+> issues #142 (T1), #143 (T2, which also carries the `checkov` gating) and #144 (T5); T3, T4,
+> T6, T7 and T8 were cut, moved or superseded per the BR-D23 banner and have no issue. This file
+> is kept for that banner and its **Critical review**.
 
 # S3 — Data-plane and IaC posture
 

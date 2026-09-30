@@ -1,4 +1,9 @@
-### FILEPATH: /sprints/SD_devcontainer/sprint_plan.md
+### FILEPATH: /sprints/_archive/SD_devcontainer/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #1 (`SD — Development container`).**
+> The task bodies below are no longer the executable plan: the remaining tasks are issues #137
+> (T4) and #138 (T5), and the milestone description carries the goal, build order and BLOCKING
+> criteria. This file is kept for its banners and its **Critical review**, which the issues cite.
 
 # SD — Development container
 
