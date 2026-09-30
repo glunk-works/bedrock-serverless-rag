@@ -1,4 +1,11 @@
-### FILEPATH: /sprints/S5_python_supply_chain/sprint_plan.md
+### FILEPATH: /sprints/_archive/S5_python_supply_chain/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #4 (`S5 — Python cleanup`).** The
+> task bodies below are no longer the executable plan; the **issue bodies** were written to
+> the BR-D23 banner's four items, keeping the original task ids: #149 (T1, BOM + exact pins),
+> #150 (T2+T3 merged, pytest harness + the contract test), #151 (T4, F31/F32) and #152 (T5,
+> one required check, `python-test`). This file is kept, unrewritten, for the banner's cut
+> list and its **Critical review**.
 
 # S5 — Python quality and supply chain
 

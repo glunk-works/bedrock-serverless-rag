@@ -1,4 +1,11 @@
-### FILEPATH: /sprints/S2_identity_least_privilege/sprint_plan.md
+### FILEPATH: /sprints/_archive/S2_identity_least_privilege/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #2 (`S2 — Identity, state
+> reconciliation, and bootstrap/ retirement`).** The task bodies below are no longer the
+> executable plan: the remaining tasks are issues #139 (T4), #140 (T5) and #141 (T6, optional);
+> Tasks 0a/0b/0c, 1, 2 and 3 landed before the migration. This file is kept for its four
+> historical re-scope banners, the lab schedule, the **residual risk register** and the
+> **Critical review**, all of which the issues cite.
 
 # S2 — Identity, state reconciliation, and `bootstrap/` retirement
 
