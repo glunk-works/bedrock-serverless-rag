@@ -46,6 +46,7 @@
 # Change this value only in a change that actually moves the repository again.
 repo: glunk-works/bedrock-serverless-rag
 pr_base: main
+migration_base: null
 
 # ── the deep record ──────────────────────────────────────────────────────────
 roadmap: docs/hardening_roadmap.md
@@ -70,6 +71,7 @@ decisions:
 
 backlog:
   kind: github_issues              # this repo has no backlog file; findings are issues.
+  repo: "glunk-works/bedrock-serverless-rag"
   path: null
   item_prefix: null
 
@@ -157,3 +159,7 @@ agents:
 models:
   architect: opus
   coder: sonnet
+  second_opinion: "fable"
+
+planning:
+  kind: "github_milestones"
