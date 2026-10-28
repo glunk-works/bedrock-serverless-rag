@@ -98,11 +98,15 @@ paths, and the paths to the deep record. Read `.ai/project.yml` at the start of 
 never copy its values into this file, and never shadow a plugin skill with a local copy of
 the same name. Both rules, and why, are in the plugin's `reference/project-schema.md`.
 
-**One** of its values is **`null` on purpose today**, and a skill must take the no-gate branch
-rather than invent one: `review.ci_gate` (no `architect-review` check — BR-D14).
+~~**One** of its values is **`null` on purpose today**, and a skill must take the no-gate branch
+rather than invent one: `review.ci_gate` (no `architect-review` check — BR-D14).~~
+**Superseded 2026-10-28 by claude-workbench#408:** `review.ci_gate` is set (`architect-review`,
+posted by `architect-review-gate.yml`), so a skill takes the gate branch; `agents.diff_rule` and
+`orchestration` stay null until the cutover completes.
 
-⚠️ **`ruleset` is NOT null — read it, do not assume it.** It is populated with the live
-`protected-integration-branches` values (four rule types, `required_checks: [pr-title]`). This
+⚠️ **`ruleset` is NOT null — read it, do not assume it.** Since claude-workbench#408 `main` has
+two rulesets: `main-required-checks` (`required_status_checks`) and `protected-integration-branches`
+(deletion, non_fast_forward, pull_request); `ruleset` mirrors the first and `rulesets` lists both. This
 paragraph asserted the opposite until 2026-08-06, which is worse than a stale fact: it is the
 one sentence here that routes a plugin skill down a branch, so it told every skill to behave as
 if no gate existed on a repo that has one.

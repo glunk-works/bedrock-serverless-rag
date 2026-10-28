@@ -2,10 +2,13 @@ name: Ruleset drift
 
 # Ported from glunk-works/bounty-infra's ruleset-drift.yml (CLAUDE.md: read the sibling
 # repo's workflows before designing a governance/CI pattern here). Every "required" check
-# in this repo blocks a merge only because the `protected-integration-branches` ruleset
-# (S0-T1) says so. This workflow re-reads the effective rules on `main` on a schedule
+# in this repo blocks a merge only because a ruleset says so. Since the
+# glunk-works/claude-workbench#408 cutover (step 2c) that protection is split across TWO
+# rulesets on the default branch: `protected-integration-branches` (deletion,
+# non_fast_forward, pull_request) and `main-required-checks` (required_status_checks). This
+# workflow re-reads the EFFECTIVE rules on `main` -- the merged view of both -- on a schedule
 # (plus workflow_dispatch, since a cron-only trigger cannot be tested without waiting for
-# the cron) and fails loudly the moment they no longer match what S0 put in place.
+# the cron) and fails loudly the moment they no longer match that shape.
 #
 # Deliberately NOT a required check and NOT a job in ci.yml or deploy.yml (S1b-T2 split the
 # file this comment originally cited, deploy-ai-lab.yml, into those two): a required check
@@ -33,7 +36,7 @@ jobs:
   ruleset-drift:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify the protected-integration-branches ruleset still holds
+      - name: Verify the rulesets on main still hold
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -49,44 +52,82 @@ jobs:
             fi
           done
 
-          contexts=$(jq -c '
-            [.[] | select(.type == "required_status_checks")
-                 | .parameters.required_status_checks[].context]
-          ' <<<"$rules")
+          # An `update` rule would block every push to main, merges included -- not a
+          # loosening, but not the shape either, so it is drift.
+          unexpected_types=()
+          if jq -e 'any(.[]; .type == "update")' <<<"$rules" >/dev/null; then
+            unexpected_types+=("update")
+          fi
 
+          # The effective view is the union of every ruleset's rules, so a context counts
+          # only if SOME required_status_checks rule lists it with GitHub Actions' app id
+          # (15368) AND that rule is strict. Matching on the context string alone would pass
+          # a same-named check posted by any other app.
+          #
           # This list mirrors .ai/project.yml's ruleset.required_checks. S1b-T7 appended five:
           # tofu-fmt, tofu-validate, tflint, secrets-scan, zizmor (checkov and tofu-plan are
-          # deliberately absent -- sprint_plan.md Task 7). Every later sprint that appends a
-          # required check updates this list, and .ai/project.yml, in the SAME pull request.
+          # deliberately absent -- sprint_plan.md Task 7). architect-review was appended by the
+          # first gated PR of the glunk-works/claude-workbench#408 cutover: it is the commit
+          # status architect-review-gate.yml posts, under GitHub Actions' app id like the rest.
+          # Every later change that appends a required check updates this list, and
+          # .ai/project.yml, in the SAME pull request.
           missing_checks=()
-          for c in pr-title tofu-fmt tofu-validate tflint secrets-scan zizmor; do
-            if ! jq -e --arg c "$c" 'index($c) != null' <<<"$contexts" >/dev/null; then
-              missing_checks+=("$c")
+          unstrict_checks=()
+          for c in pr-title tofu-fmt tofu-validate tflint secrets-scan zizmor architect-review; do
+            if ! jq -e --arg c "$c" '
+              any(.[]; .type == "required_status_checks"
+                  and any(.parameters.required_status_checks[];
+                          .context == $c and .integration_id == 15368))
+            ' <<<"$rules" >/dev/null; then
+              missing_checks+=("$c@15368")
+            elif ! jq -e --arg c "$c" '
+              any(.[]; .type == "required_status_checks"
+                  and .parameters.strict_required_status_checks_policy == true
+                  and any(.parameters.required_status_checks[];
+                          .context == $c and .integration_id == 15368))
+            ' <<<"$rules" >/dev/null; then
+              unstrict_checks+=("$c")
             fi
           done
 
-          # Beyond presence, the PARAMETERS of the two configurable rule types must still
-          # match Task 1's payload -- a type that still exists but has been loosened (e.g.
-          # `strict_required_status_checks_policy` flipped off, or stale-review dismissal
-          # turned off) is drift too, and both values are already in `$rules` at no extra
-          # API cost.
+          # Beyond presence, the PARAMETERS of the pull_request rule must still match the
+          # cutover's payload -- a type that still exists but has been loosened (stale-review
+          # dismissal off, code-owner review off, the approval count dropped) is drift too.
+          # Several rulesets can each contribute a pull_request rule; GitHub enforces the most
+          # restrictive, so the booleans are OR-ed and the count is the max across them.
           weakened=()
-          pr_params=$(jq -c '[.[] | select(.type == "pull_request") | .parameters][0] // {}' <<<"$rules")
-          if [ "$(jq -r '.dismiss_stale_reviews_on_push' <<<"$pr_params")" != "true" ]; then
+          if [ ${#unstrict_checks[@]} -gt 0 ]; then
+            weakened+=("required_status_checks.strict_required_status_checks_policy != true for: ${unstrict_checks[*]}")
+          fi
+          pr_params=$(jq -c '
+            [.[] | select(.type == "pull_request") | .parameters] as $p
+            | {
+                count: ([$p[].required_approving_review_count] | max // 0),
+                code_owner: any($p[]; .require_code_owner_review == true),
+                dismiss_stale: any($p[]; .dismiss_stale_reviews_on_push == true),
+                last_push: any($p[]; .require_last_push_approval == true)
+              }
+          ' <<<"$rules")
+          if [ "$(jq -r '.count' <<<"$pr_params")" != "1" ]; then
+            weakened+=("pull_request.required_approving_review_count != 1")
+          fi
+          if [ "$(jq -r '.code_owner' <<<"$pr_params")" != "true" ]; then
+            weakened+=("pull_request.require_code_owner_review != true")
+          fi
+          if [ "$(jq -r '.dismiss_stale' <<<"$pr_params")" != "true" ]; then
             weakened+=("pull_request.dismiss_stale_reviews_on_push != true")
           fi
-          if [ "$(jq -r '.required_approving_review_count' <<<"$pr_params")" != "0" ]; then
-            weakened+=("pull_request.required_approving_review_count != 0")
-          fi
-          rsc_params=$(jq -c '[.[] | select(.type == "required_status_checks") | .parameters][0] // {}' <<<"$rules")
-          if [ "$(jq -r '.strict_required_status_checks_policy' <<<"$rsc_params")" != "true" ]; then
-            weakened+=("required_status_checks.strict_required_status_checks_policy != true")
+          if [ "$(jq -r '.last_push' <<<"$pr_params")" != "true" ]; then
+            weakened+=("pull_request.require_last_push_approval != true")
           fi
 
-          if [ ${#missing_types[@]} -gt 0 ] || [ ${#missing_checks[@]} -gt 0 ] || [ ${#weakened[@]} -gt 0 ]; then
+          if [ ${#missing_types[@]} -gt 0 ] || [ ${#unexpected_types[@]} -gt 0 ] || [ ${#missing_checks[@]} -gt 0 ] || [ ${#weakened[@]} -gt 0 ]; then
             echo "::error::Branch protection on 'main' has been weakened or removed."
             if [ ${#missing_types[@]} -gt 0 ]; then
               echo "::error::Missing rule types: ${missing_types[*]}"
+            fi
+            if [ ${#unexpected_types[@]} -gt 0 ]; then
+              echo "::error::Unexpected rule types: ${unexpected_types[*]}"
             fi
             if [ ${#missing_checks[@]} -gt 0 ]; then
               echo "::error::Missing required checks: ${missing_checks[*]}"
@@ -94,8 +135,8 @@ jobs:
             if [ ${#weakened[@]} -gt 0 ]; then
               echo "::error::Weakened parameters: ${weakened[*]}"
             fi
-            echo "::error::See docs/hardening_roadmap.md and sprints/S0_governance_baseline/sprint_plan.md (T1) -- this ruleset is what makes every other CI check in this repo actually block a merge; restore it in Settings > Rules."
+            echo "::error::Two rulesets protect 'main': protected-integration-branches (deletion, non_fast_forward, pull_request) and main-required-checks (required_status_checks). Together they are what makes every other CI check in this repo actually block a merge; restore whichever one drifted in Settings > Rules (see docs/hardening_roadmap.md and glunk-works/claude-workbench#408)."
             exit 1
           fi
 
-          echo "OK: ruleset intact -- 4 rule types, 6 required checks, parameters match. (bypass_actors NOT checked -- see file header.)"
+          echo "OK: rulesets intact -- 4 rule types, no update rule, 7 required checks @15368 (strict), pull_request parameters match. (bypass_actors NOT checked -- see file header.)"

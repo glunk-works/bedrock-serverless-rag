@@ -19,16 +19,12 @@
     }
   },
   "remoteUser": "vscode",
-  // Host AWS config + cached SSO tokens, read-only -- `aws sso login` state on the
-  // host is usable inside without copying credentials into the image (SD sprint
-  // Security Considerations: no credential material baked in). Read-only so the
-  // container cannot write a profile the host would later trust. The
-  // `${localEnv:HOME}${localEnv:USERPROFILE}` concatenation is the documented
-  // cross-platform mount pattern -- exactly one of the two is set on any given
-  // host (verified on this workstation: HOME is empty, USERPROFILE resolves).
-  "mounts": [
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/home/vscode/.aws,type=bind,consistency=cached,readonly"
-  ],
+  // No host cloud credentials are mounted -- not ~/.aws (config or cached SSO
+  // tokens), not any other provider's. Read-only did not help: a cached SSO
+  // session is usable as-is by anything running in the container. AWS work from
+  // the container goes through CI (plan.yml's read-only plan role on PRs; deploy.yml
+  // behind the production Environment); `bootstrap/` and break-glass plans run on
+  // the host, per README.md and the tofu-local-plan skill.
   // Do NOT add INFISICAL_*, AWS_ACCESS_KEY_ID, or any TF_VAR_ secret here as a
   // literal -- if one is ever needed, reference ${localEnv:...} so the value
   // stays on the host and is never baked into container config.
