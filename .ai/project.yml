@@ -131,9 +131,8 @@ gates:
 # `gh api repos/<repo>/rulesets --jq '.[] | {id, name}'` before using one. `bypass_actors: []`
 # is deliberate -- a bypassable ruleset is a suggestion, not a control.
 #
-# `architect-review` is listed below AHEAD of the live checks ruleset: it joins
-# `main-required-checks` in the first gated PR after this one (#408), once the gate below has
-# posted on a real head. Until then the live ruleset requires the other six. checkov and
+# `architect-review` joined `main-required-checks` at #408 step 6b (2026-10-28), right after
+# PR 1 merged, so all seven below are live; `ruleset-drift.yml` checks all seven. checkov and
 # tofu-plan are deliberately absent (S1b sprint_plan.md Task 7). Each list is a SET, not an
 # ordered sequence: GitHub returns ruleset contexts in its own order.
 #

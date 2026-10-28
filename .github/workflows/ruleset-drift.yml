@@ -66,13 +66,14 @@ jobs:
           #
           # This list mirrors .ai/project.yml's ruleset.required_checks. S1b-T7 appended five:
           # tofu-fmt, tofu-validate, tflint, secrets-scan, zizmor (checkov and tofu-plan are
-          # deliberately absent -- sprint_plan.md Task 7). architect-review is NOT here yet:
-          # the #408 cutover adds it in the first gated PR after its PR 1. Every later change
-          # that appends a required check updates this list, and .ai/project.yml, in the SAME
-          # pull request.
+          # deliberately absent -- sprint_plan.md Task 7). architect-review was appended by the
+          # first gated PR of the glunk-works/claude-workbench#408 cutover: it is the commit
+          # status architect-review-gate.yml posts, under GitHub Actions' app id like the rest.
+          # Every later change that appends a required check updates this list, and
+          # .ai/project.yml, in the SAME pull request.
           missing_checks=()
           unstrict_checks=()
-          for c in pr-title tofu-fmt tofu-validate tflint secrets-scan zizmor; do
+          for c in pr-title tofu-fmt tofu-validate tflint secrets-scan zizmor architect-review; do
             if ! jq -e --arg c "$c" '
               any(.[]; .type == "required_status_checks"
                   and any(.parameters.required_status_checks[];
@@ -138,4 +139,4 @@ jobs:
             exit 1
           fi
 
-          echo "OK: rulesets intact -- 4 rule types, no update rule, 6 required checks @15368 (strict), pull_request parameters match. (bypass_actors NOT checked -- see file header.)"
+          echo "OK: rulesets intact -- 4 rule types, no update rule, 7 required checks @15368 (strict), pull_request parameters match. (bypass_actors NOT checked -- see file header.)"
