@@ -1,7 +1,6 @@
-# Default owner for everything in the repo.
-* @Seuss27
-
-# Called out explicitly so these two stay visible as high-consequence directories even
-# after ownership widens beyond a solo maintainer.
-/bootstrap/ @Seuss27
-/.github/workflows/ @Seuss27
+# Owners for everything in the repo: the human maintainers with write access.
+# Keep this the ONLY rule. A later, more specific line overrides `*` for its path, so a
+# per-directory line naming fewer owners would silently narrow review on exactly the
+# high-consequence paths (bootstrap/, .github/workflows/) it was meant to highlight
+# (glunk-works/claude-workbench#408, cutover step 2).
+* @Seuss27 @JaredGroves-603
