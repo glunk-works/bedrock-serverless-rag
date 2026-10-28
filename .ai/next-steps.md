@@ -14,6 +14,15 @@ Tasks 1–3 are merged; **Task 4 (#137)** and Task 5 (#138) remain. `S2` is park
 **The sprint ledger is now GitHub milestones and issues, not files.** `.ai/project.yml`
 declares `planning.kind: github_milestones` (PR #136); this session made the repo agree with it.
 
+⚠️ **Landed after this snapshot (2026-10-28): the identities cutover,
+`glunk-works/claude-workbench#408`.** The plugin pin is **v0.28.0** (#184). `review.ci_gate` is
+set, so **`architect-review` is a required check**, posted by `architect-review-gate.yml` from a
+fresh-session `glunk-review[bot]` review on the PR head (#184; first run on #185). `main` now has
+**two rulesets**: `main-required-checks` (7 strict checks) and `protected-integration-branches`
+(1 code-owner approval, last-push approval, squash only). CODEOWNERS names both maintainers
+(#182). Any PR touching `code_paths` needs that review plus an approval from the code owner who
+didn't push last. The 2026-09-30 notes below predate all of this.
+
 ## Just done
 
 - **Migrated the file-based sprint ledger to GitHub milestones** (2026-09-30, Fable/architect):
@@ -26,7 +35,7 @@ declares `planning.kind: github_milestones` (PR #136); this session made the rep
   four new required checks to one, keeping the banner's four items and its original task ids
   in the titles; S3-T1 lost its VPC branch; S4-T4 lost the retry half `MW`-T3 already fixed).
 - **`/way-of-working:critic-gate` ran `docs-consistency` on the migration** (the only critic look
-  this diff gets — `review.ci_gate` is `null`): round 1 returned 14 findings, nine of them
+  this diff got — `review.ci_gate` was `null` until the 2026-10-28 cutover): round 1 returned 14 findings, nine of them
   false or operationally wrong claims *in the issue bodies* (BR-D15 "add" when it already
   exists; a tflint rule "re-enable" already done; a checkov "no suppression" criterion that
   cannot pass beside the cuts; a retry hazard contradicting PR #93; #139's step-4 deletion
@@ -49,7 +58,8 @@ declares `planning.kind: github_milestones` (PR #136); this session made the rep
 - **Resume housekeeping this session:** the checkout was on an already-merged branch and behind
   `main` by #135/#136 — fast-forwarded, stale branch deleted; pruned 3 squash-merged local
   branches, **skipped `docs/sync-cursor-github-mcp-and-pin`** (its tip is not what GitHub merged
-  — stranded work, look before deleting); ruleset healthy (4 rule types, 6 required checks).
+  — stranded work, look before deleting); ruleset healthy as of 2026-09-30 (4 rule types, 6 required checks; since split
+  into two rulesets with 7 checks, see above).
 
 ## Next
 
