@@ -9,15 +9,15 @@
 # silently stops receiving upstream fixes.
 #
 # EVERY VALUE BELOW DESCRIBES THIS REPO AS IT IS ON 2026-10-28 (last touched by the
-# claude-workbench#408 schema fold), not as the hardening roadmap intends it to become. A sprint
+# claude-workbench#408 cutover's PR 1), not as the hardening roadmap intends it to become. A sprint
 # that changes one of these facts updates this file in the SAME pull request; a stale value
 # here makes every skill that reads it report a confident answer about a repo that no longer
 # exists. This date has gone stale silently before (two days, on `ruleset.name`'s own null
 # claim) — bump it deliberately in the same PR that changes a value, not on a schedule.
 #
-# FOUR keys are `null` on purpose: `review.ci_gate` (BR-D14 — no `architect-review` check), and
-# `agents.diff_rule`, `orchestration`, `identities` — null until the claude-workbench#408
-# cutover; its PR 1 replaces `identities` with the map.
+# TWO keys are `null` on purpose: `agents.diff_rule` and `orchestration`, both until the
+# claude-workbench#408 cutover completes. (`review.ci_gate` was null under BR-D14 -- no
+# `architect-review` check -- until #408 superseded it.)
 # ⚠️ `ruleset.name` is NOT null and has not been since 2026-08-05. This header claimed it was
 # until 2026-08-07, which was worse than an ordinary stale line: `ruleset` is what routes a
 # plugin skill down the gate / no-gate branch, so the claim told every skill to behave as if
@@ -113,45 +113,57 @@ gates:
     - { cwd: bootstrap,           run: "tofu init -backend=false && tofu validate" }
 
 # ── branch protection ────────────────────────────────────────────────────────
-# S0-T1 installed `protected-integration-branches` on 2026-08-05. The live ruleset id is
-# **20506099**, re-verified 2026-08-06. It is NOT the id S0-T1 originally created (20487049):
-# S0-T6's drift-detector test deliberately deleted and recreated the ruleset, which mints a new
-# id. That is exactly the trap the roadmap's 2026-08-06 log entry warns about -- never trust a
-# previously recorded id, and note the undo command below carries one. Re-read it live before
-# using it; a stale id either 404s or, worse, names a different ruleset.
-# Read live from `gh api repos/glunk-works/bedrock-serverless-rag/rules/branches/main`: exactly
-# the four rule types below, enforcement "active", `bypass_actors: []`. Verified end-to-end on
-# 2026-08-05 -- a direct `git push` to `main` was rejected with GH013 naming both the
-# `pull_request` rule and the missing `pr-title` status check.
-# ✅ RE-VERIFIED UNDER THE NEW OWNER by ST-T4 (2026-08-07) rather than assumed to survive the
-# transfer: same four rule types, same enforcement, `bypass_actors` still empty, and
-# `ruleset-drift.yml` manually dispatched green (run 31136157954). The path above was
-# `Seuss27/...` until the transfer; the command is operative, so it was updated -- unlike the
-# `Seuss27` strings in the sprint plans and the roadmap's finding inventory, which are
-# historical record and are exempt BY NAME (see ST Task 4's rewritten acceptance criterion).
+# Since the claude-workbench#408 cutover (step 2c, 2026-10-28) `main` is protected by TWO
+# active rulesets on `~DEFAULT_BRANCH`, both with `bypass_actors: []`:
+#   * `main-required-checks` (id 26042322) -- the one `required_status_checks` rule: strict,
+#     every context pinned to GitHub Actions (integration_id 15368).
+#   * `protected-integration-branches` (id 20506099, S0-T1's ruleset) -- deletion,
+#     non_fast_forward, and pull_request: 1 approval from a code owner, stale reviews dismissed
+#     on push, last-push approval required, squash the only merge method.
+# The approval count is 1 now that CODEOWNERS names two humans with write access; it was 0
+# while this was a solo-owner repo, because GitHub forbids approving your own PR.
+# `ruleset-drift.yml` re-reads the merged view (`gh api repos/<repo>/rules/branches/main`)
+# daily and fails on drift from this shape.
 #
-# `required_approving_review_count` stays 0 (see the `pull_request` rule's parameters, not
-# reflected in this summary): GitHub forbids approving your own PR, so any value >= 1
-# deadlocks a solo-owner repo. `bypass_actors: []` is deliberate -- a bypassable ruleset is
-# a suggestion, not a control; the undo is `gh api -X DELETE .../rulesets/<id>` -- resolve
-# `<id>` live with `gh api repos/<repo>/rulesets --jq '.[].id'`, never from this comment.
-# S1b-T7 (2026-08-09) appended five checks: tofu-fmt, tofu-validate, tflint, secrets-scan,
-# zizmor. checkov and tofu-plan are deliberately absent -- see sprint_plan.md Task 7. The list
-# below is a SET, not an ordered sequence: GitHub returns ruleset contexts in its own order,
-# not the order they were PUT in (Task 7's own acceptance criterion).
+# The ids are recorded for orientation, NOT for use: S0-T6's drift-detector test once deleted
+# and recreated the ruleset, which minted a new id (20487049 -> 20506099), and a stale id either
+# 404s or, worse, names a different ruleset. Resolve ids live with
+# `gh api repos/<repo>/rulesets --jq '.[] | {id, name}'` before using one. `bypass_actors: []`
+# is deliberate -- a bypassable ruleset is a suggestion, not a control.
+#
+# `architect-review` is listed below AHEAD of the live checks ruleset: it joins
+# `main-required-checks` in the first gated PR after this one (#408), once the gate below has
+# posted on a real head. Until then the live ruleset requires the other six. checkov and
+# tofu-plan are deliberately absent (S1b sprint_plan.md Task 7). Each list is a SET, not an
+# ordered sequence: GitHub returns ruleset contexts in its own order.
+#
+# `ruleset` is the legacy single-ruleset key and mirrors the checks ruleset; `rulesets` names both.
 ruleset:
-  name: protected-integration-branches
-  rule_types: [deletion, non_fast_forward, pull_request, required_status_checks]
-  required_checks: [pr-title, tofu-fmt, tofu-validate, tflint, secrets-scan, zizmor]
+  name: main-required-checks
+  rule_types: [required_status_checks]
+  required_checks: [pr-title, tofu-fmt, tofu-validate, tflint, secrets-scan, zizmor, architect-review]
+rulesets:
+  - name: main-required-checks
+    source: repo
+    rule_types: [required_status_checks]
+    required_checks: [pr-title, tofu-fmt, tofu-validate, tflint, secrets-scan, zizmor, architect-review]
+  - name: protected-integration-branches
+    source: repo
+    rule_types: [deletion, non_fast_forward, pull_request]
 
 # ── the fresh-session review gate ────────────────────────────────────────────
-# `null` is a decision, not a gap: this repo has no `architect-review` CI check. Its critic
-# pass is /way-of-working:critic-gate, run locally before the PR — which makes that pass the only critic
-# look a diff gets before the human's merge click. S1 does NOT add one; the roadmap records
-# (BR-D14) that a review gate is worth nothing until the deterministic gates it sits beside
-# actually block a merge.
+# `.github/workflows/architect-review-gate.yml` (copied byte-identical from claude-workbench
+# v0.28.0) posts the `architect-review` commit status on each PR head: `success` when the PR
+# touches nothing under `triggers_on`, or carries a fresh-session review by `reviewer_app`;
+# `failure` otherwise. It reads these values from the DEFAULT branch's copy of this file, never
+# the PR's. BR-D14's "no `architect-review` check" is superseded by claude-workbench#408.
+# /way-of-working:critic-gate still runs locally before the PR; it does not satisfy this gate.
 review:
-  ci_gate: null
+  ci_gate:
+    check: architect-review
+    header: "**Opus/Architect review (automated)**"
+    attestation: "*Fresh-session review: this session did not author the diff.*"
+    triggers_on: null # null means code_paths; a PR touching nothing under code_paths is not gated.
 
 # ── agents ───────────────────────────────────────────────────────────────────
 # `models` governs *session* routing (which model a person should be running), not what a
@@ -167,7 +179,19 @@ models:
 planning:
   kind: "github_milestones"
 
-# null until the claude-workbench#408 cutover; PR 1 replaces `identities` with the map.
+# null until the claude-workbench#408 cutover completes.
 orchestration: null
-# null until the claude-workbench#408 cutover; PR 1 replaces `identities` with the map.
-identities: null
+# The same App and user ids as glunk-works/global-bootstrap. The dev App is declared but stays
+# uninstalled on this repo, by the maintainer's decision.
+identities:
+  maintainer:
+    - {login: Seuss27, id: 22668449}
+  dev_app:
+    login: "glunk-dev[bot]"
+    id: 339840170
+  reviewer_app:
+    login: "glunk-review[bot]"
+    id: 339841158
+  loop_app:
+    login: "glunk-loop[bot]"
+    id: 338193635
