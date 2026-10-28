@@ -42,7 +42,9 @@ real and hit a genuine upstream bug — see below — and is now blocked on a fi
    (not 8), then dispatch `destroy-ai-lab` with the typed confirm phrase (BR-D25) — the clean
    cycle #17's own Acceptance section requires. Both steps are still human-gated.
 
-   Full spec: `grep -n '^### Task 4' -A 60 sprints/S2_identity_least_privilege/sprint_plan.md`.
+   Full spec: issue #139 (`S2-T4`) on milestone #2 — *migrated 2026-09-30 from
+   `sprints/S2_identity_least_privilege/sprint_plan.md` Task 4, now archived under
+   `sprints/_archive/`.* Then #140 (`S2-T5`) and, optionally, #141 (`S2-T6`).
 
 **This session parks `S2`** (swapping back to `SD`) rather than chasing #17 now — that fix lives
 in a different repo and isn't part of this canary. `/way-of-working:unpark-sprint S2` once #17
@@ -59,8 +61,10 @@ human-gated actions as before (approval on re-apply, confirm phrase on re-destro
 - `docs/hardening_roadmap.md` — reference of record and threat model. `BR-D14` ties
   `architect-review` readiness to `S2` landing — this blocker is part of why `S2` hasn't
   landed yet.
-- `sprints/S2_identity_least_privilege/sprint_plan.md` — Task 4 step 3: 3.1 satisfied, 3.2 ran
-  partially (8/12, then failed), 3.3 ran against the partial build (destroy succeeded), full
-  clean cycle pending `global-bootstrap#17`.
+- [Milestone #2](https://github.com/glunk-works/bedrock-serverless-rag/milestone/2) — the S2
+  plan since 2026-09-30; issue #139 is Task 4: step 3: 3.1 satisfied, 3.2 ran partially (8/12,
+  then failed), 3.3 ran against the partial build (destroy succeeded), full clean cycle pending
+  `global-bootstrap#17`. The archived file plan (banners, residual register, Critical review) is
+  `sprints/_archive/S2_identity_least_privilege/sprint_plan.md`.
 - `glunk-works/global-bootstrap#17` — the blocking upstream issue.
 - `.ai/parked/` — about to also hold `S2`'s snapshot alongside the swap back to `SD`.

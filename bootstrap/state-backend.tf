@@ -216,6 +216,7 @@ resource "aws_iam_role_policy" "state_access_policy" {
 }
 
 # ⚠️ TEMPORARY WIDEN (MW-T5, F55/F39). Every verb added by MW-T5 above -- and this whole
-# resource -- is deleted, not narrowed, by S2-T2 step 3 once CI adopts global-bootstrap's
+# resource -- is deleted, not narrowed, by S2-T4 step 4 (issue #139) once CI adopts global-bootstrap's
 # roles. Do not treat this policy as a place to converge on least privilege; it goes away
-# wholesale. See sprints/S2_identity_least_privilege/sprint_plan.md Task 2, step 3.
+# wholesale. See issue #139 (S2-T4, step 4) -- the plan text that used to live at
+# sprints/S2_identity_least_privilege/sprint_plan.md is archived under sprints/_archive/.

@@ -1,8 +1,9 @@
 # state-migration.tf
 #
-# Grants this project's LOCAL role (aws_iam_role.github_actions_role, state-backend.tf) the
-# two things S2 Task 2 rides on one bootstrap/ apply (sprints/S2_identity_least_privilege/
-# sprint_plan.md, Task 2): KMS access to the upstream BR-D22 state-encryption key, and the
+# Grants this project's LOCAL role (aws_iam_role.github_actions_role, oidc-setup.tf) the
+# two things S2 Task 2 rides on one bootstrap/ apply (archived plan: sprints/_archive/
+# S2_identity_least_privilege/sprint_plan.md, Task 2; both policies are deleted with the role
+# by S2-T4 step 4, issue #139): KMS access to the upstream BR-D22 state-encryption key, and the
 # read-only org-bucket bridge Task 3 needs. Both target the LOCAL role specifically because
 # CI still authenticates as it today -- Task 0c already granted the identical KMS statement
 # to both UPSTREAM roles (glunk-works/global-bootstrap's project_policies.tf and

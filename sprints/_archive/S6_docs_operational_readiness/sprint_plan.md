@@ -1,4 +1,10 @@
-### FILEPATH: /sprints/S6_docs_operational_readiness/sprint_plan.md
+### FILEPATH: /sprints/_archive/S6_docs_operational_readiness/sprint_plan.md
+
+> **📦 ARCHIVED 2026-09-30 — superseded by GitHub milestone #5 (`S6 — Documentation and
+> operational readiness`).** The task bodies below are no longer the executable plan: the
+> tasks are issues #8 (T1 — the pre-existing README issue, spec added as a comment), #153 (T2)
+> and #155 (T4+T5, merged per the banner below; #154 briefly held T4 alone and was closed into
+> #155); T3 moved to S0. This file is kept for the BR-D23 banner and its **Critical review**.
 
 # S6 — Documentation and operational readiness
 
