@@ -41,6 +41,18 @@ name: Plan
 # sprint_plan.md Task 4 step 5 adds tofu-plan to the required list, it means no fork PR can ever
 # merge. Accepted rather than worked around: this repo's only contributor is its own org, and
 # failing loudly beats silently skipping a check.
+#
+# R5's ONE exception: Dependabot. A run whose actor is dependabot[bot] never gets this repo's
+# Actions secrets (only the separate Dependabot secret store, deliberately empty here), so the
+# guard below failed on every Dependabot PR -- a guaranteed red mark, not a signal. The job is
+# skipped for that actor instead. Copying the plan role into the Dependabot store was rejected:
+# Dependabot PRs change action versions, and this job runs the PR branch's own copy of this
+# file, so a hostile upstream release would run holding AWS credentials. Safe to skip because
+# .github/dependabot.yml covers github-actions only, so a Dependabot PR never changes a .tf
+# file and its plan would equal main's. `github.actor` (not the PR author) is the right key:
+# it is what decides whether secrets are present, and a human pushing to a Dependabot branch
+# gets a real plan. ⚠️ If tofu-plan becomes a required check (R5 above), a skipped job
+# SATISFIES it, so revisit this if Dependabot ever gains an ecosystem that touches .tf files.
 on:
   pull_request:
     branches: [main]
@@ -57,6 +69,8 @@ concurrency:
 
 jobs:
   tofu-plan:
+    # Dependabot runs get no Actions secrets -- see "R5's ONE exception" in the header.
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
