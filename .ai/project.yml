@@ -8,14 +8,16 @@
 # option — a repo-local `.claude/skills/<name>/` shadows the plugin's copy entirely and
 # silently stops receiving upstream fixes.
 #
-# EVERY VALUE BELOW DESCRIBES THIS REPO AS IT IS ON 2026-08-09 (last touched by S1b-T7's
-# ruleset.required_checks update), not as the hardening roadmap intends it to become. A sprint
+# EVERY VALUE BELOW DESCRIBES THIS REPO AS IT IS ON 2026-10-28 (last touched by the
+# claude-workbench#408 schema fold), not as the hardening roadmap intends it to become. A sprint
 # that changes one of these facts updates this file in the SAME pull request; a stale value
 # here makes every skill that reads it report a confident answer about a repo that no longer
 # exists. This date has gone stale silently before (two days, on `ruleset.name`'s own null
 # claim) — bump it deliberately in the same PR that changes a value, not on a schedule.
 #
-# EXACTLY ONE key is `null` on purpose: `review.ci_gate` (BR-D14 — no `architect-review` check).
+# FOUR keys are `null` on purpose: `review.ci_gate` (BR-D14 — no `architect-review` check), and
+# `agents.diff_rule`, `orchestration`, `identities` — null until the claude-workbench#408
+# cutover; its PR 1 replaces `identities` with the map.
 # ⚠️ `ruleset.name` is NOT null and has not been since 2026-08-05. This header claimed it was
 # until 2026-08-07, which was worse than an ordinary stale line: `ruleset` is what routes a
 # plugin skill down the gate / no-gate branch, so the claim told every skill to behave as if
@@ -156,6 +158,7 @@ review:
 # spawned subagent runs as — an agent's model comes from its own frontmatter upstream.
 agents:
   enabled: [architect, coder, security-critic, docs-consistency]
+  diff_rule: null
 models:
   architect: opus
   coder: sonnet
@@ -163,3 +166,8 @@ models:
 
 planning:
   kind: "github_milestones"
+
+# null until the claude-workbench#408 cutover; PR 1 replaces `identities` with the map.
+orchestration: null
+# null until the claude-workbench#408 cutover; PR 1 replaces `identities` with the map.
+identities: null
