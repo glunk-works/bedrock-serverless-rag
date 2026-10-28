@@ -365,8 +365,11 @@ already written into these plans and every `Closes:` line in the inventory.*
 > **📌 Where the plans live, after 2026-09-30.** `.ai/project.yml` now declares
 > `planning.kind: github_milestones`: **one sprint = one GitHub milestone, and the milestone's
 > open issues are the task list.** The milestone description is the plan prose (goal, build
-> order, `BLOCKING:` criteria, model per phase); each task issue's body is the full task spec,
-> rewritten to agree with its sprint's banner. The six file-based plans that were still live or
+> order, `BLOCKING:` criteria, model per phase); each task issue's body holds the migrated task
+> text, rewritten to agree with its sprint's banner. ⚠️ Since the 2026-10-28 identities cutover
+> (`glunk-works/claude-workbench#408`) that body is **not** the spec: a task is built only from a
+> `/way-of-working:spec-task` comment a declared maintainer has reacted to, restated from the
+> body (#193). The six file-based plans that were still live or
 > planned (`S2`, `S3`, `S4`, `S5`, `S6`, `SD`) moved to **`sprints/_archive/<id>_<slug>/sprint_plan.md`**,
 > kept for their banners, residual registers and Critical reviews, which the issues cite. The
 > four completed sprints' plans (`S0`, `ST`, `MW`, `S1`) stay at `sprints/<id>_<slug>/` as

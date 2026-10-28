@@ -21,7 +21,10 @@ fresh-session `glunk-review[bot]` review on the PR head (#184; first run on #185
 **two rulesets**: `main-required-checks` (7 strict checks) and `protected-integration-branches`
 (1 code-owner approval, last-push approval, squash only). CODEOWNERS names both maintainers
 (#182). Any PR touching `code_paths` needs that review plus an approval from the code owner who
-didn't push last. The 2026-09-30 notes below predate all of this.
+didn't push last. And under the identities map **an issue body is no longer a task's spec**:
+each task needs a `/way-of-working:spec-task` comment that a maintainer has reacted to, and none
+of the migrated issues has one yet (#193). The 2026-09-30 notes below predate all of this,
+including "every issue body is the full task spec".
 
 ## Just done
 
@@ -68,8 +71,11 @@ didn't push last. The 2026-09-30 notes below predate all of this.
 1. **task #137 — SD-T4:** `.devcontainer/README.md` with CI's exact command lines (closes
    **F62**), update the *existing* BR-D15 row in roadmap § 4 to in-force, the `CLAUDE.md`
    § Commands pointer, a comment-only note in `.ai/project.yml`, and the two carried roadmap
-   edits (correct the stale **F61** row; record the **GitHub MCP server** decision). Spec is the
-   issue body; the archived plan's Critical review is
+   edits (correct the stale **F61** row; record the **GitHub MCP server** decision).
+   ⚠️ **No spec yet.** Under the identities map the spec is a maintainer-reacted spec comment,
+   never the issue body, and #137 has none. First run `/way-of-working:spec-task 137` in a
+   `models.architect` session and have a maintainer react to the comment; only then can a coder
+   session build it (#193). The archived plan's Critical review is
    `sprints/_archive/SD_devcontainer/sprint_plan.md`.
 2. **task #138 — SD-T5:** dependabot `docker` entry, no per-PR image build.
 3. **`/way-of-working:plan-sprint`** for the eight open issues deliberately left unmilestoned
