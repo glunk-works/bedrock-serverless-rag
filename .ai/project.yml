@@ -66,10 +66,10 @@ decisions:
   # BR-D1..BR-D26 are recorded there. KEEP THIS RANGE CURRENT: a skill told the log stops at
   # D19 has no reason to look for BR-D20 (ephemerality is a design requirement AND the
   # acceptance test), BR-D22 (native state encryption), BR-D23 (the proportionality reshape),
-  # BR-D24 (the severity rule), BR-D25 (the manual destroy path stays phrase-gated -- an
-  # accepted residual on a trust boundary) or BR-D26 (AOSS runs with standby replicas
-  # DISABLED -- an accepted availability posture whose revisit trigger reaches BR-D10's
-  # destructive chain) -- the six late decisions that changed the most.
+  # BR-D24 (the severity rule), BR-D25 (the manual destroy path runs in the production
+  # Environment, with the typed confirm phrase kept as a second check) or BR-D26 (AOSS runs
+  # with standby replicas DISABLED -- an accepted availability posture whose revisit trigger
+  # reaches BR-D10's destructive chain) -- the six late decisions that changed the most.
   log: docs/hardening_roadmap.md
   prefix: BR-D
 

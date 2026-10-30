@@ -41,6 +41,8 @@ permissions:
 # drop a middle run's apply/approval silently. Workflow-level, so `destroy-ai-lab`
 # (workflow_dispatch on the same ref) shares this group too -- a destroy dispatched while an
 # apply sits waiting for approval queues behind it; the operator can cancel the waiting run.
+# The reverse holds too: a destroy waiting for its own production approval holds the group,
+# and the next merge's run waits behind it (replacing any earlier pending one, as above).
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: false
@@ -281,7 +283,7 @@ jobs:
       # re-takes it, so the same brief-wait reasoning applies here, one step later.
       # -auto-approve is permitted here because the Environment approval already happened
       # (BR-D2). CLAUDE.md: permitted in exactly two places in this repo and nowhere else --
-      # here, and on destroy-ai-lab below (gated instead by its typed confirm phrase).
+      # here, and on destroy-ai-lab below (also behind production, plus its typed confirm phrase).
       - name: OpenTofu Apply
         run: tofu apply -input=false -lock-timeout=5m -auto-approve tfplan
 
@@ -294,20 +296,21 @@ jobs:
   # ONLY on a manual dispatch from `main` with the exact confirm phrase (see the on:
   # workflow_dispatch block above); any other event, ref, or phrase leaves this job skipped.
   # A human watches the run live rather than firing it unattended, per the MW sprint plan's
-  # Critical review. Carried across BYTE-IDENTICAL from deploy-ai-lab.yml (S1b-T2 planning
-  # decision 2) -- including keeping the `name:` key. Deliberately NOT behind
-  # `environment: production`: GitHub permits self-approval on Environments, so on a
-  # one-maintainer repo it would buy zero independent review while changing this job's OIDC
-  # subject. The typed confirm phrase plus a human watching the run live is the accepted
-  # control; revisit on a second maintainer (BR-D25). `workflow_dispatch`-only, so it can
-  # never become a required check -- F18's name:-override rule does not bind it, and the
-  # human-readable name is worth having in the dispatch UI.
+  # Critical review. Runs in the `production` Environment (BR-D25), so every job in this file
+  # that assumes the apply role -- tofu-apply and this one -- runs in that Environment, and
+  # tofu-plan-main uses the plan role. Every destroy also leaves a deployment record. The
+  # typed confirm phrase stays as a second check, and production keeps its required reviewers
+  # because this job is destructive. GitHub permits self-approval on Environments, so the
+  # approval is not independent review.
+  # `workflow_dispatch`-only, so it can never become a required check -- the name:-override
+  # rule does not bind it, and the human-readable name is worth having in the dispatch UI.
   destroy-ai-lab:
     name: Destroy AI Lab Infrastructure (manual)
     if: >-
       github.event_name == 'workflow_dispatch' &&
       github.ref == 'refs/heads/main' &&
       github.event.inputs.confirm == 'destroy-ai-lab'
+    environment: production
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -370,10 +373,11 @@ jobs:
           echo "::endgroup::"
 
       # Applies the exact destroy plan saved above. -auto-approve is required (no TTY on a
-      # hosted runner); the human approval this repo requires (BR-D2) is the act of
-      # dispatching this job with the correct confirm phrase, plus watching this run live
-      # per the MW sprint plan -- the same accepted-gap shape as tofu-apply's own
-      # -auto-approve path (F13, fixed by S1a-T5, out of scope for this job).
+      # hosted runner); the human approval this repo requires (BR-D2) is the production
+      # Environment approval this job waits on, plus the typed confirm phrase and a human
+      # watching this run live. Unlike tofu-apply, this job plans and destroys in one job, so
+      # its approval is requested when the job starts, before the destroy plan above exists:
+      # the approver approves the dispatch, not a plan they have read.
       - name: OpenTofu Destroy
         run: tofu apply -auto-approve -input=false tfplan
 
