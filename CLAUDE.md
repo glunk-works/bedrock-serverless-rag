@@ -135,7 +135,8 @@ if no gate existed on a repo that has one.
   gated on the `production` Environment, and it applies **the saved plan file** rather than
   re-planning. **`-auto-approve` is permitted in exactly two places and nowhere else** —
   `tofu-apply`, because the Environment approval already happened; and `destroy-ai-lab`, whose
-  approval is the typed confirm phrase plus a human watching the run (BR-D25). **Do not add a
+  approval is the `production` Environment approval plus the typed confirm phrase, with a human
+  watching the run (BR-D25, revised 2026-10-30). **Do not add a
   third**, and do not add any new path that reaches AWS without one of those two forms of
   approval in front of it.
 - **`tofu plan` output is summarized, never dumped** (BR-D4). This repo is public and plan

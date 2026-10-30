@@ -71,6 +71,12 @@ jobs:
   tofu-plan:
     # Dependabot runs get no Actions secrets -- see "R5's ONE exception" in the header.
     if: github.actor != 'dependabot[bot]'
+    # Runs behind the pr-plan Environment's required reviewer. The approval prompt does not show
+    # the workflow, and a pull_request run uses the PR branch's own copy of this file. So before
+    # approving, the approver reads the run's .github/ diff at the PR's head SHA. pr-plan has no
+    # deployment branch policy on purpose: PR runs use refs/pull/<n>/merge, and a branch policy
+    # would block them.
+    environment: pr-plan
     runs-on: ubuntu-latest
     permissions:
       id-token: write
